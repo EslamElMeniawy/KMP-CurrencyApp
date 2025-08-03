@@ -2,8 +2,10 @@ package elmeniawy.eslam.currencyapp.data.remote.api
 
 import elmeniawy.eslam.currencyapp.BuildKonfig
 import elmeniawy.eslam.currencyapp.domain.CurrencyApiService
+import elmeniawy.eslam.currencyapp.domain.PreferencesRepository
 import elmeniawy.eslam.currencyapp.domain.model.ApiResponse
 import elmeniawy.eslam.currencyapp.domain.model.Currency
+import elmeniawy.eslam.currencyapp.domain.model.CurrencyCode
 import elmeniawy.eslam.currencyapp.domain.model.RequestState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -20,7 +22,7 @@ import kotlinx.serialization.json.Json
  *
  * Created by Eslam El-Meniawy on 31-Jul-2025 at 3:40 PM.
  */
-class CurrencyApiServiceImp : CurrencyApiService {
+class CurrencyApiServiceImp(private val _preferences: PreferencesRepository) : CurrencyApiService {
     companion object {
         const val ENDPOINT = "https://api.currencyapi.com/v3/latest"
         val API_KEY = BuildKonfig.API_KEY
@@ -48,9 +50,21 @@ class CurrencyApiServiceImp : CurrencyApiService {
         val response = _httpClient.get(ENDPOINT)
 
         if (response.status.value == 200) {
-            println("API RESPONSE: ${response.body<String>()}")
             val apiResponse = Json.decodeFromString<ApiResponse?>(response.body())
-            RequestState.Success(data = apiResponse?.data?.values?.toList())
+
+            val availableCurrencyCodes = apiResponse?.data?.keys?.filter {
+                CurrencyCode.entries.map { code -> code.name }.toSet().contains(it)
+            }
+
+            val availableCurrencies = apiResponse?.data?.values?.filter { currency ->
+                availableCurrencyCodes?.contains(currency.code) == true
+            }
+
+            // Persist a timestamp.
+            val lastUpdated = apiResponse?.meta?.lastUpdatedAt
+            lastUpdated?.let { _preferences.saveLastUpdated(it) }
+
+            RequestState.Success(data = availableCurrencies)
         } else {
             RequestState.Error(message = "HTTP Error Code: ${response.status}")
         }
