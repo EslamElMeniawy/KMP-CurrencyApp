@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.buildKonfig)
     alias(libs.plugins.kotlinxSerialization)
-    alias(libs.plugins.realm.plugin)
+//    alias(libs.plugins.realm.plugin)
 }
 
 kotlin {
@@ -58,7 +58,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.multiplatform.settings.coroutines)
-            implementation(libs.realm)
+//            implementation(libs.realm)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.stately.common)
         }
