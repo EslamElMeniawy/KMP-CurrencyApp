@@ -1,9 +1,21 @@
 package elmeniawy.eslam.currencyapp.presentation.screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import elmeniawy.eslam.currencyapp.data.remote.api.CurrencyApiServiceImp
+import cafe.adriel.voyager.koin.getScreenModel
+import elmeniawy.eslam.currencyapp.presentation.component.HomeHeader
 
 /**
  * HomeScreen
@@ -13,8 +25,36 @@ import elmeniawy.eslam.currencyapp.data.remote.api.CurrencyApiServiceImp
 class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        LaunchedEffect(Unit) {
-            CurrencyApiServiceImp().getLatestExchangeRates()
+        val viewModel = getScreenModel<HomeViewModel>()
+        val rateStatus by viewModel.rateStatus
+        val sourceCurrency by viewModel.sourceCurrency
+        val targetCurrency by viewModel.targetCurrency
+
+        var amount by rememberSaveable { mutableStateOf(0.0) }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                HomeHeader(
+                    status = rateStatus,
+                    source = sourceCurrency,
+                    target = targetCurrency,
+                    amount = amount,
+                    onAmountChange = { amount = it },
+                    onRatesRefresh = { viewModel.sendEvent(HomeUiEvent.RefreshRates) },
+                    onSwitchClick = { viewModel.sendEvent(HomeUiEvent.SwitchCurrencies) }
+                )
+            }
         }
     }
 }
