@@ -17,6 +17,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import elmeniawy.eslam.currencyapp.domain.model.CurrencyType
 import elmeniawy.eslam.currencyapp.presentation.component.CurrencyPickerDialog
+import elmeniawy.eslam.currencyapp.presentation.component.HomeBody
 import elmeniawy.eslam.currencyapp.presentation.component.HomeHeader
 
 /**
@@ -93,6 +94,12 @@ class HomeScreen : Screen {
                         selectedCurrencyType = currencyType
                         dialogOpened = true
                     }
+                )
+
+                HomeBody(
+                    source = sourceCurrency,
+                    target = targetCurrency,
+                    amount = amount
                 )
             }
         }
