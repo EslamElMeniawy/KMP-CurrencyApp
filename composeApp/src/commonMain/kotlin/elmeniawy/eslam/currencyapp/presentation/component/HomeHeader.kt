@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -73,8 +75,9 @@ fun HomeHeader(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.inverseSurface)
             .padding(all = 24.dp)
+            .statusBarsPadding()
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         RatesStatus(status = status, onRatesRefresh = onRatesRefresh)
@@ -103,6 +106,7 @@ fun RatesStatus(status: RateStatus, onRatesRefresh: () -> Unit) {
             Image(
                 modifier = Modifier.size(50.dp),
                 painter = painterResource(Res.drawable.exchange_illustration),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inverseOnSurface),
                 contentDescription = "Exchange Rate Illustration"
             )
 
@@ -111,16 +115,16 @@ fun RatesStatus(status: RateStatus, onRatesRefresh: () -> Unit) {
             Column {
                 Text(
                     text = displayCurrentDateTime(),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.inverseOnSurface
                 )
 
                 Text(
                     text = status.title,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     color = when (status) {
-                        RateStatus.Stale -> MaterialTheme.colorScheme.error
-                        RateStatus.Fresh -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.onSurface
+                        RateStatus.Stale -> MaterialTheme.colorScheme.errorContainer
+                        RateStatus.Fresh -> MaterialTheme.colorScheme.inversePrimary
+                        else -> MaterialTheme.colorScheme.inverseOnSurface
                     }
                 )
             }
@@ -132,7 +136,7 @@ fun RatesStatus(status: RateStatus, onRatesRefresh: () -> Unit) {
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(Res.drawable.refresh_ic),
                     contentDescription = "Refresh Icon",
-                    tint = MaterialTheme.colorScheme.error
+                    tint = MaterialTheme.colorScheme.errorContainer
                 )
             }
         }
@@ -168,6 +172,7 @@ fun CurrencyInputs(
                 )
             }
         })
+
         Spacer(modifier = Modifier.height(14.dp))
 
         IconButton(
@@ -182,7 +187,7 @@ fun CurrencyInputs(
             Icon(
                 painter = painterResource(Res.drawable.switch_ic),
                 contentDescription = "Switch Icon",
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.inverseOnSurface
             )
         }
 
@@ -213,7 +218,7 @@ fun RowScope.CurrencyView(
             modifier = Modifier.padding(start = 12.dp),
             text = placeholder,
             fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.inverseOnSurface
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -222,7 +227,7 @@ fun RowScope.CurrencyView(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                .background(MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.05f))
                 .height(54.dp)
                 .clickable { onClick() },
             verticalAlignment = Alignment.CenterVertically,
@@ -246,7 +251,7 @@ fun RowScope.CurrencyView(
                     text = CurrencyCode.valueOf(data?.code ?: "").name,
                     fontWeight = FontWeight.Bold,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.inverseOnSurface
                 )
             })
         }
@@ -264,17 +269,17 @@ fun AmountInput(amount: Double, onAmountChange: (Double) -> Unit) {
         value = "$amount",
         onValueChange = { onAmountChange(it.toDoubleOrNull() ?: 0.0) },
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
-            unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
-            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
-            errorContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+            focusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.05f),
+            unfocusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.05f),
+            disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.05f),
+            errorContainerColor = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.05f),
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            cursorColor = MaterialTheme.colorScheme.onSurface
+            cursorColor = MaterialTheme.colorScheme.inverseOnSurface
         ),
         textStyle = TextStyle(
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.inverseOnSurface,
             fontSize = MaterialTheme.typography.titleLarge.fontSize,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
