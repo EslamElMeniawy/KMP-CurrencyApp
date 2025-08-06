@@ -40,14 +40,34 @@ class HomeScreen : Screen {
             mutableStateOf(CurrencyType.None)
         }
 
-        var dialogOpened by remember { mutableStateOf(true) }
+        var dialogOpened by remember { mutableStateOf(false) }
 
-        if (dialogOpened) {
+        if (dialogOpened && selectedCurrencyType != CurrencyType.None) {
             CurrencyPickerDialog(
                 currencies = allCurrencies,
                 currencyType = selectedCurrencyType,
-                onPositiveClick = { dialogOpened = false },
-                onDismiss = { dialogOpened = false })
+                onConfirmClick = { currencyCode ->
+                    if (selectedCurrencyType is CurrencyType.Source) {
+                        viewModel.sendEvent(
+                            HomeUiEvent.SaveSourceCurrencyCode(
+                                code = currencyCode.name
+                            )
+                        )
+                    } else if (selectedCurrencyType is CurrencyType.Target) {
+                        viewModel.sendEvent(
+                            HomeUiEvent.SaveTargetCurrencyCode(
+                                code = currencyCode.name
+                            )
+                        )
+                    }
+
+                    selectedCurrencyType = CurrencyType.None
+                    dialogOpened = false
+                },
+                onDismiss = {
+                    selectedCurrencyType = CurrencyType.None
+                    dialogOpened = false
+                })
         }
 
         Box(
@@ -70,7 +90,11 @@ class HomeScreen : Screen {
                     amount = amount,
                     onAmountChange = { amount = it },
                     onRatesRefresh = { viewModel.sendEvent(HomeUiEvent.RefreshRates) },
-                    onSwitchClick = { viewModel.sendEvent(HomeUiEvent.SwitchCurrencies) }
+                    onSwitchClick = { viewModel.sendEvent(HomeUiEvent.SwitchCurrencies) },
+                    onCurrencyTypeSelect = { currencyType ->
+                        selectedCurrencyType = currencyType
+                        dialogOpened = true
+                    }
                 )
             }
         }

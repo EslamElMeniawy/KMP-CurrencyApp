@@ -45,6 +45,7 @@ import currencyapp.composeapp.generated.resources.refresh_ic
 import currencyapp.composeapp.generated.resources.switch_ic
 import elmeniawy.eslam.currencyapp.domain.model.Currency
 import elmeniawy.eslam.currencyapp.domain.model.CurrencyCode
+import elmeniawy.eslam.currencyapp.domain.model.CurrencyType
 import elmeniawy.eslam.currencyapp.domain.model.DisplayResult
 import elmeniawy.eslam.currencyapp.domain.model.RateStatus
 import elmeniawy.eslam.currencyapp.domain.model.RequestState
@@ -65,7 +66,8 @@ fun HomeHeader(
     amount: Double,
     onAmountChange: (Double) -> Unit,
     onRatesRefresh: () -> Unit,
-    onSwitchClick: () -> Unit
+    onSwitchClick: () -> Unit,
+    onCurrencyTypeSelect: (CurrencyType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -77,7 +79,14 @@ fun HomeHeader(
         Spacer(modifier = Modifier.height(24.dp))
         RatesStatus(status = status, onRatesRefresh = onRatesRefresh)
         Spacer(modifier = Modifier.height(24.dp))
-        CurrencyInputs(source = source, target = target, onSwitchClick = onSwitchClick)
+
+        CurrencyInputs(
+            source = source,
+            target = target,
+            onSwitchClick = onSwitchClick,
+            onCurrencyTypeSelect = onCurrencyTypeSelect
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
         AmountInput(amount = amount, onAmountChange = onAmountChange)
     }
@@ -134,7 +143,8 @@ fun RatesStatus(status: RateStatus, onRatesRefresh: () -> Unit) {
 fun CurrencyInputs(
     source: RequestState<Currency>,
     target: RequestState<Currency>,
-    onSwitchClick: () -> Unit
+    onSwitchClick: () -> Unit,
+    onCurrencyTypeSelect: (CurrencyType) -> Unit
 ) {
     var animationStarted by remember { mutableStateOf(false) }
 
@@ -147,7 +157,17 @@ fun CurrencyInputs(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CurrencyView(placeholder = "From", currency = source, onClick = {})
+        CurrencyView(placeholder = "From", currency = source, onClick = {
+            if (source.isSuccess()) {
+                onCurrencyTypeSelect(
+                    CurrencyType.Source(
+                        currencyCode = CurrencyCode.valueOf(
+                            source.getSuccessData()?.code ?: ""
+                        )
+                    )
+                )
+            }
+        })
         Spacer(modifier = Modifier.height(14.dp))
 
         IconButton(
@@ -167,7 +187,18 @@ fun CurrencyInputs(
         }
 
         Spacer(modifier = Modifier.height(14.dp))
-        CurrencyView(placeholder = "To", currency = target, onClick = {})
+
+        CurrencyView(placeholder = "To", currency = target, onClick = {
+            if (target.isSuccess()) {
+                onCurrencyTypeSelect(
+                    CurrencyType.Target(
+                        currencyCode = CurrencyCode.valueOf(
+                            target.getSuccessData()?.code ?: ""
+                        )
+                    )
+                )
+            }
+        })
     }
 }
 
